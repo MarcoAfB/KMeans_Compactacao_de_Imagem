@@ -25,9 +25,13 @@ class KMeans():
                 break
 
     def __calcularCentroid(self):
+        centroidAntigo = self.__centroid.copy()
         for i in range(self.__qntCluster):      
             selecionarPontos = self.__observacoescomClasse[:,-1] == i
-            self.__centroid[i,:] = np.mean(self.__dadosObservados[selecionarPontos],axis=0)
+            if np.count_nonzero(selecionarPontos) == 0:
+                self.__centroid[i,:] = centroidAntigo[i,:]
+            else:
+                self.__centroid[i,:] = np.mean(self.__dadosObservados[selecionarPontos],axis=0)
 
     def __selecionarPontosCentroid(self):
         posicaoObservacoes = np.random.choice(range(self.__qntObservacoes),
@@ -36,11 +40,10 @@ class KMeans():
     
     def __calcularDistanciaPontoCentroid(self):
         distanciaPontoCentroid = np.ones([self.__qntObservacoes,self.__qntCluster])
-        for i in range(self.__qntObservacoes):
-            for j in range(self.__qntCluster):
-                observacao = self.__dadosObservados[i,:]
-                centroidSelecionada = self.__centroid[j,:]
-                distanciaPontoCentroid[i,j] = np.linalg.norm(observacao - centroidSelecionada)
+        for j in range(self.__qntCluster):
+            relacaoCentroidObservacoes = self.__dadosObservados - self.__centroid[j,:]
+            distanciaMatrizCentroid = np.linalg.norm(relacaoCentroidObservacoes, axis=1)
+            distanciaPontoCentroid[:,j:j+1] = distanciaMatrizCentroid.reshape(self.__qntObservacoes,1)
         return distanciaPontoCentroid
 
     def __encontrarClasseObservacao(self):
