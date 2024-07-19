@@ -16,16 +16,33 @@ class KMeans():
     
     def criarCluster(self):
         self.__selecionarPontosCentroid()
-        self.__diferencaCentroidAntigo = []
+        self.__diferencaCentroidAntigo = [np.inf]
+        altaConsecutiva=[]
         while True:
-            centroidAntigo = self.__centroid.copy()
+            self.__centroidAntigo = self.__centroid.copy()
             self.__encontrarClasseObservacao()
             self.__calcularCentroid()
-            self.__calcularDiferencaCentroid(centroidAntigo)
-            diferencaMedia = np.mean(self.__diferencaCentroidAntigo)
-            if diferencaMedia*0.2 > self.__diferencaCentroidAntigo[-1]:
+            self.__calcularDiferencaCentroid()
+            if self.__verificarConvergencia(altaConsecutiva):
                 break
 
+    def __calcularDiferencaCentroid(self):
+        diferenca = np.linalg.norm([self.__centroidAntigo - self.__centroid])
+        self.__diferencaCentroidAntigo.append(diferenca)
+        
+    def __verificarConvergencia(self, altaConsecutiva):
+        evolucaoNovoCentroid = self.__diferencaCentroidAntigo[-2] - self.__diferencaCentroidAntigo[-1]
+        if evolucaoNovoCentroid<0:
+            altaConsecutiva.append(1)
+            if len(altaConsecutiva) == 2:
+                self.__centroid = self.__melhorCentroid
+                return True
+            if len(altaConsecutiva) == 1:
+                self.__melhorCentroid = self.__centroidAntigo
+        else:
+            altaConsecutiva = []
+        return False
+    
     def __calcularDiferencaCentroid(self, centroidAntigo):
         diferenca = np.linalg.norm([centroidAntigo - self.__centroid])
         self.__diferencaCentroidAntigo.append(diferenca)
