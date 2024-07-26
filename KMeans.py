@@ -32,7 +32,7 @@ class KMeans():
         
     def __verificarConvergencia(self, altaConsecutiva):
         evolucaoNovoCentroid = self.__diferencaCentroidAntigo[-2] - self.__diferencaCentroidAntigo[-1]
-        if evolucaoNovoCentroid<0:
+        if evolucaoNovoCentroid<=0:
             altaConsecutiva.append(1)
             if len(altaConsecutiva) == 2:
                 self.__centroid = self.__melhorCentroid
@@ -42,10 +42,6 @@ class KMeans():
         else:
             altaConsecutiva = []
         return False
-    
-    def __calcularDiferencaCentroid(self, centroidAntigo):
-        diferenca = np.linalg.norm([centroidAntigo - self.__centroid])
-        self.__diferencaCentroidAntigo.append(diferenca)
 
     def __calcularCentroid(self):
         centroidAntigo = self.__centroid.copy()
